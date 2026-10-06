@@ -1,0 +1,1029 @@
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbxRnT21E9yLlHQFzovTLczDMZeCSXVUJpjgn1UvVZMJpdj1MgvZb5x2zfCYweSgOT4fOg/exec";
+
+
+let settings = {};
+
+let adminPassword = "";
+
+let registrationOpen = true;
+
+
+/* =========================
+   LOAD SETTINGS
+========================= */
+
+async function loadSettings() {
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL +
+        "?action=settings"
+      );
+
+    settings =
+      await response.json();
+
+
+    document.getElementById(
+      "playerCount"
+    ).textContent =
+      settings.approvedPlayers;
+
+
+    document.getElementById(
+      "maxPlayers"
+    ).textContent =
+      settings.maxPlayers;
+
+
+    document.getElementById(
+      "entryFee"
+    ).textContent =
+      settings.entryFee;
+
+
+    document.getElementById(
+      "paymentFee"
+    ).textContent =
+      settings.entryFee;
+
+
+    document.getElementById(
+      "paymentMethod"
+    ).textContent =
+      settings.paymentMethod;
+
+
+    document.getElementById(
+      "paymentName"
+    ).textContent =
+      settings.paymentName;
+
+
+    document.getElementById(
+      "paymentNumber"
+    ).textContent =
+      settings.paymentNumber;
+
+
+    registrationOpen =
+      settings.registrationOpen;
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+  }
+
+}
+
+
+/* =========================
+   LOAD PLAYERS
+========================= */
+
+async function loadPlayers() {
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL +
+        "?action=players"
+      );
+
+    const players =
+      await response.json();
+
+
+    const container =
+      document.getElementById(
+        "playersList"
+      );
+
+
+    container.innerHTML = "";
+
+
+    if (!players.length) {
+
+      container.innerHTML =
+        "<p>No approved players yet.</p>";
+
+      return;
+    }
+
+
+    players.forEach(
+      (player, index) => {
+
+        const div =
+          document.createElement(
+            "div"
+          );
+
+        div.className =
+          "player-card";
+
+
+        div.innerHTML = `
+
+          <strong>
+            #${index + 1}
+          </strong>
+
+          <h3>
+            ${escapeHTML(
+              player.playerName
+            )}
+          </h3>
+
+          <p>
+            ${escapeHTML(
+              player.telegramUsername
+            )}
+          </p>
+
+        `;
+
+
+        container.appendChild(div);
+
+      }
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+  }
+
+}
+
+
+/* =========================
+   LOAD RESULTS
+========================= */
+
+async function loadResults() {
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL +
+        "?action=results"
+      );
+
+    const results =
+      await response.json();
+
+
+    const container =
+      document.getElementById(
+        "resultsList"
+      );
+
+
+    container.innerHTML = "";
+
+
+    if (!results.length) {
+
+      container.innerHTML =
+        "<p>No results yet.</p>";
+
+      return;
+    }
+
+
+    results
+      .reverse()
+      .forEach(match => {
+
+        const div =
+          document.createElement(
+            "div"
+          );
+
+
+        div.className =
+          "result-card";
+
+
+        div.innerHTML = `
+
+          <span>
+            ${escapeHTML(
+              match.player1
+            )}
+          </span>
+
+          <span class="score">
+
+            ${match.goals1}
+            -
+            ${match.goals2}
+
+          </span>
+
+          <span>
+            ${escapeHTML(
+              match.player2
+            )}
+          </span>
+
+        `;
+
+
+        container.appendChild(div);
+
+      });
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+  }
+
+}
+
+
+/* =========================
+   LOAD STANDINGS
+========================= */
+
+async function loadStandings() {
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL +
+        "?action=standings"
+      );
+
+    const table =
+      await response.json();
+
+
+    const body =
+      document.getElementById(
+        "standingsBody"
+      );
+
+
+    body.innerHTML = "";
+
+
+    table.forEach(
+      (player, index) => {
+
+        const row =
+          document.createElement(
+            "tr"
+          );
+
+
+        row.innerHTML = `
+
+          <td>
+            ${index + 1}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              player.playerName
+            )}
+          </td>
+
+          <td>
+            ${player.played}
+          </td>
+
+          <td>
+            ${player.wins}
+          </td>
+
+          <td>
+            ${player.draws}
+          </td>
+
+          <td>
+            ${player.losses}
+          </td>
+
+          <td>
+            ${player.goalsFor}
+          </td>
+
+          <td>
+            ${player.goalsAgainst}
+          </td>
+
+          <td>
+            ${player.goalDifference}
+          </td>
+
+          <td>
+            <strong>
+              ${player.points}
+            </strong>
+          </td>
+
+        `;
+
+
+        body.appendChild(row);
+
+      }
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+  }
+
+}
+
+
+/* =========================
+   REGISTER
+========================= */
+
+document
+  .getElementById(
+    "registrationForm"
+  )
+  .addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+
+      if (!registrationOpen) {
+
+        showMessage(
+          "registerMessage",
+          "Registration is currently closed."
+        );
+
+        return;
+      }
+
+
+      const button =
+        document.getElementById(
+          "registerButton"
+        );
+
+
+      button.disabled = true;
+
+      button.textContent =
+        "SUBMITTING...";
+
+
+      try {
+
+        const file =
+          document.getElementById(
+            "paymentScreenshot"
+          ).files[0];
+
+
+        let base64 = "";
+
+
+        if (file) {
+
+          base64 =
+            await fileToBase64(file);
+
+          base64 =
+            base64.split(",")[1];
+
+        }
+
+
+        const data = {
+
+          action:
+            "register",
+
+          playerName:
+            document.getElementById(
+              "playerName"
+            ).value.trim(),
+
+          telegramUsername:
+            document.getElementById(
+              "telegramUsername"
+            ).value.trim(),
+
+          phone:
+            document.getElementById(
+              "phone"
+            ).value.trim(),
+
+          transactionId:
+            document.getElementById(
+              "transactionId"
+            ).value.trim(),
+
+          paymentScreenshot:
+            base64,
+
+          fileName:
+            file
+              ? file.name
+              : "",
+
+          mimeType:
+            file
+              ? file.type
+              : ""
+
+        };
+
+
+        const response =
+          await fetch(
+            API_URL,
+            {
+
+              method:
+                "POST",
+
+              body:
+                JSON.stringify(data)
+
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        showMessage(
+          "registerMessage",
+          result.message
+        );
+
+
+        if (result.success) {
+
+          document
+            .getElementById(
+              "registrationForm"
+            )
+            .reset();
+
+
+          loadSettings();
+
+          loadPlayers();
+
+        }
+
+      }
+
+      catch (error) {
+
+        showMessage(
+          "registerMessage",
+          "Registration failed."
+        );
+
+        console.error(error);
+
+      }
+
+
+      button.disabled = false;
+
+      button.textContent =
+        "SUBMIT REGISTRATION";
+
+    }
+  );
+
+
+/* =========================
+   ADMIN LOGIN
+========================= */
+
+function adminLogin() {
+
+  const password =
+    document.getElementById(
+      "adminPassword"
+    ).value;
+
+
+  if (!password) {
+
+    showMessage(
+      "adminLoginMessage",
+      "Enter admin password."
+    );
+
+    return;
+  }
+
+
+  adminPassword =
+    password;
+
+
+  document
+    .getElementById(
+      "adminLogin"
+    )
+    .classList.add(
+      "hidden"
+    );
+
+
+  document
+    .getElementById(
+      "adminPanel"
+    )
+    .classList.remove(
+      "hidden"
+    );
+
+
+  loadPending();
+
+}
+
+
+/* =========================
+   LOAD PENDING
+========================= */
+
+async function loadPending() {
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL +
+        "?action=pending"
+      );
+
+
+    const pending =
+      await response.json();
+
+
+    const container =
+      document.getElementById(
+        "pendingList"
+      );
+
+
+    container.innerHTML = "";
+
+
+    if (!pending.length) {
+
+      container.innerHTML =
+        "<p>No pending registrations.</p>";
+
+      return;
+
+    }
+
+
+    pending.forEach(item => {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+
+      div.className =
+        "pending-card";
+
+
+      div.innerHTML = `
+
+        <h4>
+          ${escapeHTML(
+            item.playerName
+          )}
+        </h4>
+
+        <p>
+          Telegram:
+          ${escapeHTML(
+            item.telegramUsername
+          )}
+        </p>
+
+        <p>
+          Phone:
+          ${escapeHTML(
+            item.phone
+          )}
+        </p>
+
+        <p>
+          Transaction:
+          ${escapeHTML(
+            item.transactionId
+          )}
+        </p>
+
+        <button
+          onclick="approvePlayer('${item.id}')"
+        >
+          APPROVE
+        </button>
+
+        <button
+          onclick="rejectPlayer('${item.id}')"
+        >
+          REJECT
+        </button>
+
+      `;
+
+
+      container.appendChild(div);
+
+    });
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+  }
+
+}
+
+
+/* =========================
+   APPROVE
+========================= */
+
+async function approvePlayer(id) {
+
+  await adminAction(
+    "approve",
+    { id: id }
+  );
+
+}
+
+
+/* =========================
+   REJECT
+========================= */
+
+async function rejectPlayer(id) {
+
+  await adminAction(
+    "reject",
+    { id: id }
+  );
+
+}
+
+
+/* =========================
+   ADMIN ACTION
+========================= */
+
+async function adminAction(
+  action,
+  extra = {}
+) {
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL,
+        {
+
+          method:
+            "POST",
+
+          body:
+            JSON.stringify({
+
+              action:
+                action,
+
+              adminPassword:
+                adminPassword,
+
+              ...extra
+
+            })
+
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    showMessage(
+      "adminMessage",
+      result.message
+    );
+
+
+    if (result.success) {
+
+      loadPending();
+
+      loadPlayers();
+
+      loadSettings();
+
+    }
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+  }
+
+}
+
+
+/* =========================
+   ADD RESULT
+========================= */
+
+document
+  .getElementById(
+    "resultForm"
+  )
+  .addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+
+      const data = {
+
+        action:
+          "addResult",
+
+        adminPassword:
+          adminPassword,
+
+        round:
+          document.getElementById(
+            "resultRound"
+          ).value,
+
+        player1:
+          document.getElementById(
+            "resultPlayer1"
+          ).value,
+
+        goals1:
+          Number(
+            document.getElementById(
+              "resultGoals1"
+            ).value
+          ),
+
+        player2:
+          document.getElementById(
+            "resultPlayer2"
+          ).value,
+
+        goals2:
+          Number(
+            document.getElementById(
+              "resultGoals2"
+            ).value
+          )
+
+      };
+
+
+      try {
+
+        const response =
+          await fetch(
+            API_URL,
+            {
+
+              method:
+                "POST",
+
+              body:
+                JSON.stringify(data)
+
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        showMessage(
+          "adminMessage",
+          result.message
+        );
+
+
+        if (result.success) {
+
+          document
+            .getElementById(
+              "resultForm"
+            )
+            .reset();
+
+
+          loadResults();
+
+          loadStandings();
+
+        }
+
+      }
+
+      catch (error) {
+
+        console.error(error);
+
+      }
+
+    }
+  );
+
+
+/* =========================
+   SETTINGS
+========================= */
+
+async function saveSettings() {
+
+  const maxPlayers =
+    Number(
+      document.getElementById(
+        "newMaxPlayers"
+      ).value
+    );
+
+
+  const entryFee =
+    Number(
+      document.getElementById(
+        "newEntryFee"
+      ).value
+    );
+
+
+  await adminAction(
+    "settings",
+    {
+
+      maxPlayers:
+        maxPlayers,
+
+      entryFee:
+        entryFee
+
+    }
+  );
+
+}
+
+
+/* =========================
+   TOGGLE REGISTRATION
+========================= */
+
+async function toggleRegistration() {
+
+  await adminAction(
+    "settings",
+    {
+
+      registrationOpen:
+        !registrationOpen
+
+    }
+  );
+
+}
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function goToRegister() {
+
+  document
+    .getElementById(
+      "register"
+    )
+    .scrollIntoView({
+      behavior: "smooth"
+    });
+
+}
+
+
+function showMessage(
+  elementId,
+  message
+) {
+
+  document.getElementById(
+    elementId
+  ).textContent =
+    message;
+
+}
+
+
+function fileToBase64(file) {
+
+  return new Promise(
+    (resolve, reject) => {
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        () =>
+          resolve(
+            reader.result
+          );
+
+
+      reader.onerror =
+        reject;
+
+
+      reader.readAsDataURL(file);
+
+    }
+  );
+
+}
+
+
+function escapeHTML(value) {
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+  div.textContent =
+    value ?? "";
+
+  return div.innerHTML;
+
+}
+
+
+/* =========================
+   INITIAL LOAD
+========================= */
+
+loadSettings();
+
+loadPlayers();
+
+loadResults();
+
+loadStandings();
