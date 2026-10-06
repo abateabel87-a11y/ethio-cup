@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ETHIO CUP</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="header">
+
+  <div class="logo">
+    🏆 ETHIO CUP
+  </div>
+
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#register">Register</a>
+    <a href="#players">Players</a>
+    <a href="#results">Results</a>
+    <a href="#standings">Standings</a>
+    <a href="#admin">Admin</a>
+  </nav>
+
+</header>
+
+
+<main>
+
+<!-- HOME -->
+
+<section id="home" class="hero">
+
+  <div class="hero-content">
+
+    <div class="badge">
+      ⚽ EFOOTBALL TOURNAMENT
+    </div>
+
+    <h1>ETHIO CUP</h1>
+
+    <p>
+      The ultimate Ethiopian eFootball competition.
+    </p>
+
+    <div class="stats">
+
+      <div>
+        <strong id="playerCount">0</strong>
+        <span>Players</span>
+      </div>
+
+      <div>
+        <strong id="maxPlayers">16</strong>
+        <span>Maximum</span>
+      </div>
+
+      <div>
+        <strong id="entryFee">100</strong>
+        <span>Entry Fee</span>
+      </div>
+
+    </div>
+
+    <button onclick="goToRegister()">
+      REGISTER NOW
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- REGISTER -->
+
+<section id="register" class="section">
+
+  <h2>PLAYER REGISTRATION</h2>
+
+  <div class="card">
+
+    <div class="payment-box">
+
+      <h3>💳 PAYMENT INFORMATION</h3>
+
+      <p>
+        <b>Method:</b>
+        <span id="paymentMethod">
+          Telebirr
+        </span>
+      </p>
+
+      <p>
+        <b>Name:</b>
+        <span id="paymentName">
+          Fkirte Abate
+        </span>
+      </p>
+
+      <p>
+        <b>Number:</b>
+        <span id="paymentNumber">
+          0964048743
+        </span>
+      </p>
+
+      <p>
+        <b>Entry Fee:</b>
+        <span id="paymentFee">
+          100
+        </span>
+        BIRR
+      </p>
+
+    </div>
+
+
+    <form id="registrationForm">
+
+      <label>Player Name</label>
+
+      <input
+        type="text"
+        id="playerName"
+        placeholder="Enter your name"
+        required
+      >
+
+
+      <label>Telegram Username</label>
+
+      <input
+        type="text"
+        id="telegramUsername"
+        placeholder="@username"
+        required
+      >
+
+
+      <label>Phone Number</label>
+
+      <input
+        type="tel"
+        id="phone"
+        placeholder="09XXXXXXXX"
+        required
+      >
+
+
+      <label>Transaction ID</label>
+
+      <input
+        type="text"
+        id="transactionId"
+        placeholder="Enter Telebirr transaction ID"
+        required
+      >
+
+
+      <label>Payment Screenshot</label>
+
+      <input
+        type="file"
+        id="paymentScreenshot"
+        accept="image/*"
+        required
+      >
+
+
+      <label class="checkbox">
+
+        <input
+          type="checkbox"
+          id="agree"
+          required
+        >
+
+        I agree to the ETHIO CUP tournament rules.
+
+      </label>
+
+
+      <button
+        type="submit"
+        id="registerButton"
+      >
+        SUBMIT REGISTRATION
+      </button>
+
+    </form>
+
+    <div id="registerMessage"></div>
+
+  </div>
+
+</section>
+
+
+<!-- PLAYERS -->
+
+<section id="players" class="section">
+
+  <h2>APPROVED PLAYERS</h2>
+
+  <div
+    id="playersList"
+    class="players-grid"
+  >
+  </div>
+
+</section>
+
+
+<!-- RESULTS -->
+
+<section id="results" class="section">
+
+  <h2>MATCH RESULTS</h2>
+
+  <div
+    id="resultsList"
+    class="results-list"
+  >
+  </div>
+
+</section>
+
+
+<!-- STANDINGS -->
+
+<section id="standings" class="section">
+
+  <h2>LEAGUE TABLE</h2>
+
+  <div class="table-wrapper">
+
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>#</th>
+          <th>Player</th>
+          <th>P</th>
+          <th>W</th>
+          <th>D</th>
+          <th>L</th>
+          <th>GF</th>
+          <th>GA</th>
+          <th>GD</th>
+          <th>PTS</th>
+        </tr>
+
+      </thead>
+
+      <tbody id="standingsBody">
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
+
+
+<!-- ADMIN -->
+
+<section id="admin" class="section">
+
+  <h2>ADMIN PANEL</h2>
+
+  <div
+    id="adminLogin"
+    class="card"
+  >
+
+    <h3>🔐 Admin Login</h3>
+
+    <input
+      type="password"
+      id="adminPassword"
+      placeholder="Admin Password"
+    >
+
+    <button onclick="adminLogin()">
+      LOGIN
+    </button>
+
+    <div id="adminLoginMessage"></div>
+
+  </div>
+
+
+  <div
+    id="adminPanel"
+    class="admin-panel hidden"
+  >
+
+    <h3>Pending Registrations</h3>
+
+    <div id="pendingList"></div>
+
+
+    <hr>
+
+
+    <h3>Add Match Result</h3>
+
+    <form id="resultForm">
+
+      <input
+        type="text"
+        id="resultRound"
+        placeholder="Round e.g. League"
+        value="League"
+        required
+      >
+
+      <input
+        type="text"
+        id="resultPlayer1"
+        placeholder="Player 1"
+        required
+      >
+
+      <input
+        type="number"
+        id="resultGoals1"
+        placeholder="Goals"
+        min="0"
+        required
+      >
+
+      <input
+        type="text"
+        id="resultPlayer2"
+        placeholder="Player 2"
+        required
+      >
+
+      <input
+        type="number"
+        id="resultGoals2"
+        placeholder="Goals"
+        min="0"
+        required
+      >
+
+      <button type="submit">
+        SAVE RESULT
+      </button>
+
+    </form>
+
+
+    <hr>
+
+
+    <h3>Tournament Settings</h3>
+
+    <input
+      type="number"
+      id="newMaxPlayers"
+      placeholder="Maximum Players"
+    >
+
+    <input
+      type="number"
+      id="newEntryFee"
+      placeholder="Entry Fee"
+    >
+
+    <button onclick="saveSettings()">
+      SAVE SETTINGS
+    </button>
+
+    <button onclick="toggleRegistration()">
+      OPEN / CLOSE REGISTRATION
+    </button>
+
+    <div id="adminMessage"></div>
+
+  </div>
+
+</section>
+
+</main>
+
+
+<footer>
+
+  <h3>🏆 ETHIO CUP</h3>
+
+  <p>
+    Ethiopian eFootball Tournament
+  </p>
+
+  <p>
+    © 2026 ETHIO CUP
+  </p>
+
+</footer>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>
