@@ -546,8 +546,15 @@ function adminLogin() {
   }
 
 
-  adminPassword =
-    password;
+  if (password !== "Abela1210") {
+
+    showMessage(
+      "adminLoginMessage",
+      "Incorrect admin password."
+    );
+
+    return;
+  }
 
 
   document
